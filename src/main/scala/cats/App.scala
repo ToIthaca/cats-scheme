@@ -6,6 +6,7 @@ import cats.syntax._
 import cats.implicits._
 
 import  IO._
+import Parser._
 
 object App {
 
@@ -20,6 +21,10 @@ object App {
       _ <- IO(_.putStrLn("Hello, "))
     } yield ()
 
-    m.run(World)
+    Option(1) >>= (_ => Option(3))
+
+    //m.run(World)
+
+    println(oneOf("!#$%&|*+-/:<=>?@^_~").apply("!"))
   }
 }
