@@ -15,7 +15,7 @@ object App {
 
   def readExpr(s: String): String = {
     val p = oneOf("!#$%&|*+-/:<=>?@^_~")
-    p(s) match {
+    p.parse(s) match {
       case Xor.Left(err) => s"No match: ${s.show}"
       case Xor.Right(v) => "Found value"
     }

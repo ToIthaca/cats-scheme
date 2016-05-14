@@ -6,15 +6,20 @@ import cats.implicits._
 
 case class ParserError(s: String)
 
-trait Parser[A] {
-  def apply(s: String): ParserError Xor A
+import Parser._
+
+final class ParserOps[A](p: Parser[A]) {
+  def parse(s: String): ParserError Xor A = p.run(s.toArray.toList).value._2
 }
 
 object Parser {
-  def oneOf(pattern: String): Parser[Char] = new Parser[Char] {
-    def apply(s: String): ParserError Xor Char = {
-      val c = s.toCharArray()(0)
-      if(pattern.toArray.contains(c)) c.right else Xor.left(ParserError(s"not found $c"))
-    }
+
+  implicit def stateToParser[A](p: Parser[A]): ParserOps[A] = new ParserOps(p)
+
+  type Parser[A] = State[List[Char], ParserError Xor A]
+
+  def oneOf(pattern: String): Parser[Char]= State[List[Char], ParserError Xor Char] {
+    case x :: xs => (xs, if(pattern.toArray.contains(x)) x.right else Xor.left(ParserError(s"not found $x")))
   }
+
 }
