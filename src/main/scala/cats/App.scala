@@ -34,6 +34,8 @@ object App {
 
     //m.run(World)
 
-    println(readExpr("1"))
+    println(" ".toArray.contains("asd".toList.head))
+
+    println(skipManySpaces.parseS("   asd"))
   }
 }
