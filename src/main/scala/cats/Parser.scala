@@ -1,3 +1,45 @@
+/*package cats
+
+import cats._
+import cats.data._
+import cats.implicits._
+
+case class ParserError(s: String)
+
+import Parser._
+
+final class ParserOps[A](p: Parser[A]) {
+  def parse(s: String): ParserError Xor A = p.value.run(s.toList).value._2
+  def parseS(s: String): (String, ParserError Xor A) = {
+    val (ca, xor) = p.value.run(s.toList).value
+    (ca.toString, xor)
+  }
+}
+
+object Parser {
+
+  implicit def stateToParser[A](p: Parser[A]): ParserOps[A] = new ParserOps(p)
+
+  type Parser[A] = XorT[State[List[Char], ?], ParserError, A]
+
+  def apply[A](f: List[Char] => (List[Char], ParserError Xor A)): Parser[A] = XorT[State[List[Char], ?], ParserError, A](State(f))
+
+  def oneOf(pattern: String): Parser[Char]= apply {
+    case x :: xs => (xs, if(pattern.toArray.contains(x)) x.right else ParserError(s"not found $pattern").left)
+    case Nil => (Nil, ParserError(s"not found $pattern").left)
+  }
+
+  val skip1Space: Parser[Unit] = oneOf(" ").map(_ => ())
+  val skipManySpaces: Parser[Unit] = apply { c =>
+    skip1Space.value.run(c).value match {
+      case (_, Xor.Left(_)) => (c, ().right)
+      case (c2, Xor.Right(_)) => skipManySpaces.value.run(c2).value
+    }
+  }
+}
+
+*/
+
 package cats
 
 import cats._
@@ -25,7 +67,8 @@ object Parser {
   def apply[A](f: List[Char] => (List[Char], A)) = State(f)
 
   def oneOf(pattern: String): Parser[Char]= State[List[Char], ParserError Xor Char] {
-    case x :: xs => (xs, if(pattern.toArray.contains(x)) x.right else ParserError(s"not found $pattern").left)
+    case x :: xs =>
+      (xs, if(pattern.toArray.contains(x)) x.right else ParserError(s"not found $pattern").left)
     case Nil => (Nil, ParserError(s"not found $pattern").left)
   }
 
@@ -38,3 +81,5 @@ object Parser {
   }
 
 }
+
+
