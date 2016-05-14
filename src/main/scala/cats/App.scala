@@ -12,6 +12,15 @@ object App {
 
   //https://en.wikibooks.org/wiki/Write_Yourself_a_Scheme_in_48_Hours/First_Steps
 
+
+  def readExpr(s: String): String = {
+    val p = oneOf("!#$%&|*+-/:<=>?@^_~")
+    p(s) match {
+      case Xor.Left(err) => s"No match: ${s.show}"
+      case Xor.Right(v) => "Found value"
+    }
+  }
+
   def main(args: Array[String]): Unit = {
 
     val getArgs = IO.getArgs(args)
@@ -25,6 +34,6 @@ object App {
 
     //m.run(World)
 
-    println(oneOf("!#$%&|*+-/:<=>?@^_~").apply("!"))
+    println(readExpr("1"))
   }
 }
