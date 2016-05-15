@@ -12,7 +12,20 @@ object Parser {
 
   def parser[A](f: List[Char] => (List[Char], ParseResult[A])): Parser[A] = XorT[State[List[Char], ?], String, A](State(f))
 
-  val skip1Space = oneOf(" ")
+  val space = " "
+  def skipMany1(symbols: String): Parser[Unit] = many(oneOf(symbols)).map(_ => ())
+  def many[A](p: Parser[A]): Parser[List[A]] = parser { chars =>
+    val state = p.value
+    @annotation.tailrec
+    def go(p: List[Char], count: Int, xs: List[A], err: Option[String]): (List[Char], Int, List[A], Option[String]) =
+      state.run(p).value match {
+        case (n, Xor.Left(e)) => (n, count, xs, Some(e))
+        case (n, Xor.Right(x)) => go(n, count + 1, x :: xs, err)  
+      }
+    val (s, count, l, err) = go(chars, 0, List.empty, None)
+    if(count > 0) (s, l.right) else (s, s"not found many symbols: ${err}".left)
+  }
+  
   def oneOf(symbols: String): Parser[Char] = parser { chars =>
     val symbol = s"([$symbols])".r
     chars.head match {
