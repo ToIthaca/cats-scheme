@@ -28,6 +28,10 @@ import Parser._
 
 final class ParserOps[A](parser: Parser[A]) {
   def <|>[B](that: Parser[B]): Parser[A Xor B] = parser.map(_.left[B]) orElse that.map(_.right[A])
+  def >>[B](that: Parser[B]): Parser[Unit] = for {
+    _ <- parser
+    _ <- that
+  } yield ()
 }
 
 sealed trait World {
